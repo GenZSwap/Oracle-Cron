@@ -1,0 +1,25 @@
+{
+  "name": "oracle-cron",
+  "version": "1.0.0",
+  "description": "Update Oracles Every 5 minutes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GenZSwap/Oracle-Cron.git"
+  },
+  "author": "Anmol Goyal (Parizval)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GenZSwap/Oracle-Cron/issues"
+  },
+  "homepage": "https://github.com/GenZSwap/Oracle-Cron#readme",
+  "dependencies": {
+    "@taquito/signer": "^7.1.0-beta.0",
+    "@taquito/taquito": "^7.1.0-beta.0",
+    "axios": "^0.21.1",
+    "cron": "^1.8.2"
+  }
+}
