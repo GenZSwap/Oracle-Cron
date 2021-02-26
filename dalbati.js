@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,58 +34,50 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
-var taquito_1 = require("@taquito/taquito");
-var axios = require('axios');
-var tezos = new taquito_1.TezosToolkit('https://delphinet.smartpy.io');
-function fetchfrombchain() {
-    return __awaiter(this, void 0, void 0, function () {
-        var res, data, _a, _b, _i, i, objectInstance, timest, _c, _d, _e, j, account, contract, storage;
-        return __generator(this, function (_f) {
-            switch (_f.label) {
-                case 0: return [4 /*yield*/, axios.get('https://better-call.dev/v1/bigmap/delphinet/75796/keys')];
-                case 1:
-                    res = _f.sent();
-                    data = res.data;
-                    _a = [];
-                    for (_b in data)
-                        _a.push(_b);
-                    _i = 0;
-                    _f.label = 2;
-                case 2:
-                    if (!(_i < _a.length)) return [3 /*break*/, 9];
-                    i = _a[_i];
-                    objectInstance = data[i].data;
-                    timest = data[i].timestamp;
-                    _c = [];
-                    for (_d in objectInstance.value.children)
-                        _c.push(_d);
-                    _e = 0;
-                    _f.label = 3;
-                case 3:
-                    if (!(_e < _c.length)) return [3 /*break*/, 7];
-                    j = _c[_e];
-                    account = objectInstance.value.children[j].value;
-                    return [4 /*yield*/, tezos.contract.at(account)];
-                case 4:
-                    contract = _f.sent();
-                    return [4 /*yield*/, contract.storage()];
-                case 5:
-                    storage = _f.sent();
-                    console.log(storage);
-                    _f.label = 6;
-                case 6:
-                    _e++;
-                    return [3 /*break*/, 3];
-                case 7:
-                    console.log('...');
-                    _f.label = 8;
-                case 8:
-                    _i++;
-                    return [3 /*break*/, 2];
-                case 9: return [2 /*return*/];
-            }
-        });
+var _this = this;
+var Axios = require('axios');
+var Tezos = require('@taquito/taquito');
+var InMemorySigner = require('@taquito/signer');
+var rpc = 'https://testnet.tezster.tech';
+var tezos = new Tezos.TezosToolkit(rpc);
+var sendPriceToContract = function (price) { return __awaiter(_this, void 0, void 0, function () {
+    var signer;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, InMemorySigner.InMemorySigner.fromSecretKey('edskRyY82578J5LV2crG5rr7JZ3tRqCqoxqAgyTKGnXx4e3anG6P93XBfBWqcabA2TZJUDJg1nvaK8a11oMvsCwxWsdiv91exN')];
+            case 1:
+                signer = _a.sent();
+                tezos.setProvider({ signer: signer });
+                tezos.contract.at("KT1QkHVNgP282zqv4NatnhDbqgQhgrMEFL4U")
+                    .then(function (contract) {
+                    return contract.methods.feedData(price).send();
+                })
+                    .then(function (op) {
+                    console.log(op.hash);
+                    return op.confirmation(2);
+                })
+                    .then(function (hash) {
+                    console.log(hash);
+                    setTimeout(function () {
+                        getPrice();
+                    }, 60000);
+                })["catch"](function (err) {
+                    console.log(err);
+                });
+                return [2 /*return*/];
+        }
     });
-}
-fetchfrombchain();
+}); };
+var getPrice = function () {
+    Axios.get("https://api.coingecko.com/api/v3/coins/tezos?localization=false&tickers=false&community_data=false&developer_data=false&sparkline=false")
+        .then(function (res) {
+        console.log(res.data.market_data.current_price.usd);
+        var priceToBeSent = res.data.market_data.current_price.usd * 100;
+        priceToBeSent = Math.floor(priceToBeSent);
+        console.log(priceToBeSent);
+        sendPriceToContract(priceToBeSent);
+    })["catch"](function (err) {
+        console.log(err);
+    });
+};
+getPrice();
